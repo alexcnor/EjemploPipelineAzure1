@@ -26,3 +26,6 @@ steps:
     script: |
       KEY=$(HELLO_WORLD)
       echo "Hello world key: " $KEY
+      echo '1 - using dollar sign parens, p dot A_Parameter is now: ' $(parameters.A_Parameter)
+      echo '2 - using dollar sign double curly braces, p dot A_Parameter is now::' ${{ parameters.A_Parameter }} '::'
+      echo '3 - using dollar sign and only the var name: ' $(A_Parameter)
