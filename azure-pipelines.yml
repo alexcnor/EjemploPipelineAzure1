@@ -3,6 +3,12 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
+parameters:
+- name: A_Parameter
+  displayName: A parameter
+  default: noValue
+  type: string
+  
 trigger:
 - main
 
