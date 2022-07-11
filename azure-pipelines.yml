@@ -1,4 +1,5 @@
-# Maven
+# Ejemplo para probar la ejecucion de pipelines desde API
+# Maven 
 # Build your Java project and run tests with Apache Maven.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
@@ -30,8 +31,4 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      KEY=$(HELLO_WORLD)
-      echo "Hello world key: " $KEY
-      echo '1 -  A_Parameter is now: ' $(parameters.A_Parameter)
-      echo '2 -  A_Parameter is now::' ${{ parameters.A_Parameter }} '::'
-      echo '3 -  A_Parameter is now : ' $(A_Parameter)
+      echo '1 -  A_Parameter = ' ${{ parameters.A_Parameter }}
