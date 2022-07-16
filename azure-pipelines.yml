@@ -10,6 +10,11 @@ parameters:
   default: noValue
   type: string
   
+- name: B_Parameter
+  displayName: B parameter
+  default: noValue
+  type: string
+
 trigger:
 - main
 
