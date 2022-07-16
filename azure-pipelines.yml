@@ -32,3 +32,4 @@ steps:
     targetType: 'inline'
     script: |
       echo '1 -  A_Parameter = ' ${{ parameters.A_Parameter }}
+      echo '1 -  B_Parameter = ' ${{ parameters.B_Parameter }}
