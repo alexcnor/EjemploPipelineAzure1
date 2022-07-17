@@ -41,6 +41,5 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      echo '1 -  A_Parameter = ' ${{ parameters.A_Parameter }}
-      echo '2 -  B_Parameter = ' ${{ parameters.B_Parameter }}
-      echo '3 -  C_Parameter = ' ${{ parameters.C_Parameter }}
+      pwd
+      ls -la
