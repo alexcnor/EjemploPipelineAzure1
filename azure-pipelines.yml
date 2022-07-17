@@ -38,6 +38,7 @@ steps:
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
 - task: Bash@3
+  condition: succeeded()
   inputs:
     targetType: 'inline'
     script: |
