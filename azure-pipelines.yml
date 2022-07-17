@@ -48,4 +48,6 @@ stages:
               script: |
                 pwd
                 ls -la
+                cd target
+                ls -la
 
