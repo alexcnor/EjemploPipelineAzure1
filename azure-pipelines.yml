@@ -20,6 +20,10 @@ parameters:
   default: noValue
   type: string
 
+variables:
+  imageName: 'EjamplePipeline'
+  imageTag: 'v1.0.0'
+
 trigger:
 - main
 
@@ -41,13 +45,19 @@ stages:
               publishJUnitResults: true
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
               goals: 'package'
-          - task: Bash@3
+          - task: Docker@2
             condition: succeeded()
+            displayName: Docker Build
             inputs:
-              targetType: 'inline'
-              script: |
-                pwd
-                ls -la
-                cd target
-                ls -la
+              command: build
+              repository: $(imageName)
+              arguments: --no-cache
+              tags: |
+                $(imageTag)
+          - task: PublishPipelineArtifact@1
+            condition: succeeded()
+            displayName: Publish Pipeline Artifact
+            inputs:
+              targetPath: $(System.DefaultWorkingDirectory)/target/helloworld.war
+              artifactName: helloworld.war
 
