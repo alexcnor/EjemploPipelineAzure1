@@ -6,8 +6,6 @@ WORKDIR /usr/app
 
 EXPOSE 8091
 
-RUN THIS IS  A BAD_COMMAND
-
 RUN java -version
 
 ENTRYPOINT ["java", "-XX:+UseG1GC", "-Xmx2g", "-Xms64m", "-Dspring.profiles.active=default", "-war", "helloworld.war", "10"]
