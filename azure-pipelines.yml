@@ -66,8 +66,8 @@ stages:
 
           - task: PublishPipelineArtifact@1
             condition: succeeded()
-            displayName: Publish Pipeline Artifact
+            displayName: 'Publish Pipeline Artifact: helloworld.war'
             inputs:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)'
               ArtifactName: 'helloworld.war'
-              publishLocation: 'Container'
+              publishLocation: 'Container'       
