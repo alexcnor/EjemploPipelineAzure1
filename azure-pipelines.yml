@@ -39,19 +39,11 @@ stages:
         publishJUnitResults: true
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
         goals: 'package'
-    - task: CopyFiles@2
-      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
-      inputs:
-        SourceFolder: '$(Build.SourcesDirectory)'
-        Contents: '**/*.jar'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)'
-        CleanTargetFolder: true
-        preserveTimestamp: true
-    - bash: 'cd $(Build.ArtifactStagingDirectory)/target/dependency && ls -la'
+    - bash: 'cd $(Build.SourcesDirectory)/target && ls -la'
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: '$(Build.ArtifactStagingDirectory)/target/dependency'
-        artifactName: 'jar'
+        targetPath: '$(Build.ArtifactStagingDirectory)/target'
+        artifactName: 'war'
         artifactType: 'pipeline'
 - stage:
   dependsOn: build
@@ -62,7 +54,7 @@ stages:
       - task: DownloadPipelineArtifact@2
         inputs:
           source: 'current'
-          artifact: 'jar'
+          artifact: 'war'
           path: '$(Build.ArtifactStagingDirectory)'
       - bash: 'cd $(Build.ArtifactStagingDirectory) && ls -la'
       - task: PublishBuildArtifacts@1
