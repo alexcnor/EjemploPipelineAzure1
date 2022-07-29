@@ -1,28 +1,7 @@
-# Ejemplo para probar la ejecucion de pipelines desde API
-# Maven 
+# Maven
 # Build your Java project and run tests with Apache Maven.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
-parameters:
-- name: A_Parameter
-  displayName: A parameter
-  default: noValue
-  type: string
-  
-- name: B_Parameter
-  displayName: B parameter
-  default: noValue
-  type: string
-
-- name: C_Parameter
-  displayName: C parameter
-  default: noValue
-  type: string
-
-variables:
-  imageName: 'EjamplePipeline'
-  imageTag: 'v1.0.0'
 
 trigger:
 - main
@@ -31,43 +10,63 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
-  - stage: 
-    jobs:
-      - job:
-        steps:
-          - task: Maven@3
-            inputs:
-              mavenPomFile: 'pom.xml'
-              mavenOptions: '-Xmx3072m'
-              javaHomeOption: 'JDKVersion'
-              jdkVersionOption: '1.8'
-              jdkArchitectureOption: 'x64'
-              publishJUnitResults: true
-              testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              goals: 'package'
-          - task: Docker@2
-            condition: succeeded()
-            displayName: Docker Build
-            inputs:
-              command: build
-              repository: $(imageName)
-              arguments: --no-cache
-              tags: |
-                $(imageTag)
-
-          - task: CopyFiles@2
-            displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
-            inputs:
-              SourceFolder: '$(Build.SourcesDirectory)'
-              Contents: '**/*.war'
-              TargetFolder: '$(Build.ArtifactStagingDirectory)'
-              CleanTargetFolder: true
-              preserveTimestamp: true
-
-          - task: PublishBuildArtifacts@1
-            condition: succeeded()
-            displayName: 'Publish Pipeline Artifact: helloworld.war'
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: 'helloworld.war'
-              publishLocation: 'Container'
+- stage: security
+  displayName: Snyk Security Scan
+  jobs:
+  - job:
+    steps:
+    - task: SnykSecurityScan@1
+      inputs:
+        serviceConnectionEndpoint: 'Snyk'
+        testType: 'app'
+        monitorWhen: 'always'
+        failOnIssues: false
+        projectName: 'T2'
+        organization: 'c60c0b73-b647-496b-874f-f4487ef9d092'
+- stage: build
+  dependsOn: security
+  displayName: Build Artifact
+  jobs:
+  - job:
+    steps:
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        goals: 'package'
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: '**/*.jar'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        CleanTargetFolder: true
+        preserveTimestamp: true
+    - bash: 'cd $(Build.ArtifactStagingDirectory)/target/dependency && ls -la'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)/target/dependency'
+        artifactName: 'jar'
+        artifactType: 'pipeline'
+- stage:
+  dependsOn: build
+  displayName: Publish Artifact
+  jobs:
+    - job:
+      steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          source: 'current'
+          artifact: 'jar'
+          path: '$(Build.ArtifactStagingDirectory)'
+      - bash: 'cd $(Build.ArtifactStagingDirectory) && ls -la'
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'webapp'
