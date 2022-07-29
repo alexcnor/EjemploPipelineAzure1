@@ -40,9 +40,18 @@ stages:
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
         goals: 'package'
     - bash: 'cd $(Build.SourcesDirectory)/target && ls -la'
+    - task: CopyFiles@2
+      displayName: 'Copy Files to publish'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/target'
+        Contents: '*.war'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        CleanTargetFolder: true
+        preserveTimestamp: true
+    - bash: 'cd $(Build.ArtifactStagingDirectory) && ls -la'
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: '$(Build.ArtifactStagingDirectory)/target'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
         artifactName: 'war'
         artifactType: 'pipeline'
 - stage:
